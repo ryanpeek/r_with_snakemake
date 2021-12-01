@@ -1,7 +1,8 @@
 # get metadata for sensors
 
+library(optparse)
 library(readr)
-library(dplyr)
+library(dplyr, warn.conflicts = FALSE)
 
 # get metadata
 metadat <- read_delim("http://apps.atm.ucdavis.edu/wxdata/metadata/sensor_info_by_id.txt", trim_ws = TRUE,
@@ -11,6 +12,6 @@ metadat <- read_delim("http://apps.atm.ucdavis.edu/wxdata/metadata/sensor_info_b
                                     "metric_units", "x2")) %>% 
   select(-(starts_with("x"))) %>% 
   filter(!is.na(sensor_id))
+dir.create("data_raw", showWarnings = FALSE)
+#write_csv(metadat, "data_raw/davis_sensor_info_by_id.csv")
 write_csv(metadat, snakemake@output[['csv']])
-
-#f_get_metadata_davis_clim()
