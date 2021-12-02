@@ -1,0 +1,39 @@
+sensor_id,metric_id,station_id,metric_name,metric_units
+12,CT_Ta2m,2,Air Temperature at 2m,Celsius
+1,CT_Ta10m,2,Air Temperature at 10m,Celsius
+2,CT_Twtr,2,Evaporation Pan Water Temperature,Celsius
+3,CT_Ts10cm,2,Soil Temperature at 10cm,Celsius
+4,CT_Ts20cm,2,Soil Temperature at 20cm,Celsius
+5,CT_Ts50cm,2,Soil Temperature at 50cm,Celsius
+6,CT_RH,2,Relative Humidity,Percent
+7,CT_WDir,2,Wind Direction,Degrees
+8,CT_WS2mMn,2,Wind Mean Speed at .5m,Meters per Second
+9,CT_WS10mMn,2,Wind Mean Speed at 10m,Meters per Second
+13,CT_Baro,2,Barometer,Inches HG
+14,CT_Epan,2,Evaporation Pan Depth,Inches
+17,RR_Ta2m,1,Air Temperature at 2m,Celsius
+18,RR_Ta10m,1,Air Temperature at 10m,Celsius
+19,RR_Twtr,1,Evaporation Pan Water Temperature,Celsius
+20,RR_Ts10cm,1,Soil Temperature at 10cm,Celsius
+21,RR_Ts20cm,1,Soil Temperature at 20cm,Celsius
+22,RR_Ts50cm,1,Soil Temperature at 50cm,Celsius
+23,RR_RH,1,Relative Humidity,Percent
+24,RR_WDir,1,Wind Direction,Degrees
+25,RR_WS2mMn,1,Wind Mean Speed at .5m,Meters per Second
+26,RR_WS10mMn,1,Wind Mean Speed at 10m,Meters per Second
+27,RR_Baro,1,Barometer,Inches HG
+28,RR_Epan,1,Evaporation Pan Depth,Inches
+29,RR_Rain_mm,1,Rainfall in last 5 minutes,Millimeters
+30,RR_Rain_Tot24,1,Rainfall since 8AM PST,Millimeters
+31,RR_Ts1m,1,Soil Temperature at 1m,Celsius
+32,RR_Ts2m,1,Soil Temperature at 2m,Celsius
+33,RR_Ts5m,1,Soil Temperature at 5m,Celsius
+34,CT_Rain_mm,2,Rainfall in last 5 minutes,Millimeters
+35,CT_Rain_Tot24,2,Rainfall since 8AM PST,Millimeters
+36,CT_DewPt,2,Dew Point,Celsius
+37,CT_WS10mMx,2,Wind Max Speed at 10m,Meters per Second
+38,CT_WS2mMx,2,Wind Max Speed at .5m,Meters per Second
+39,RR_WS2mMx,1,Wind Max Speed at .5m,Meters per Second
+40,RR_WS10mMx,1,Wind Max Speed at 10m,Meters per Second
+41,RR_DewPt,1,Dew Point,Celsius
+16,CT_RainCounter,2,Old Rain Counter,NULL
