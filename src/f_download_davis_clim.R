@@ -38,4 +38,4 @@ f_download_dav_clim <- function(outdir="data_raw"){
 
 
 # run with: 
-# f_download_dav_weather("data_raw")
+f_download_dav_clim("data_raw")
