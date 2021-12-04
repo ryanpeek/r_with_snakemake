@@ -1,33 +1,39 @@
-import pandas as pd
-m = pd.read_csv("data_raw/davis_sensor_info_by_id.csv", header=0)
-METRICS = m['metric_id'].unique().tolist()
-CT_METRICS=[word for word in METRICS if word.startswith("CT")]
-print(CT_METRICS)
+import os
+
+OUTDIR = "raw_data"
+
+def checkpoint_def_get_clim_data(wildcards):
+    # checkpoint_output encodes the output dir from the checkpoint rule.
+    checkpoint_output = checkpoints.get_clim_data.get(**wildcards).output[0]    
+    file_names = expand("{outdir}/{ct_metrics}.csv.zip",
+                        ct_metrics = glob_wildcards(os.path.join(checkpoint_output, "{ct_metrics}.csv.zip")).ct_metrics, outdir = OUTDIR)
+    return file_names
 
 rule all:
     input: 
-        metadata = "data_raw/davis_sensor_info_by_id.csv",
-        rawzips = expand("data_raw/{ct_metrics}.csv.zip", ct_metrics = CT_METRICS)
+        checkpoint_def_get_clim_data
 
 rule get_metadata:
     input: "src/smk_get_metadata_davis_clim.R"
     output: 
-        csv = "data_raw/davis_sensor_info_by_id.csv"
+        csv = "{outdir}/davis_sensor_info_by_id.csv"
     conda: "envs/tidyverse.yml"
     script: "src/smk_get_metadata_davis_clim.R"
 
-rule get_clim_data:
+# add checkpoints here or below, uses to build dag and identify pieces
+checkpoint get_clim_data:
     input:
         script = "src/smk_download_davis_clim.R",
-        outdir = "data_raw/"
-    output: 
-        expand("data_raw/{ct_metrics}.csv.zip", ct_metrics = CT_METRICS)
+        meta = "{outdir}/davis_sensor_info_by_id.csv"
+    output: directory("{outdir}")
     conda: "envs/tidyverse.yml"
     shell:'''
     Rscript {input.script}
     '''
+# use temp() for intermediate files, smk will keep for downstream until not needed
+# then deletes.
 
-rule clean:
+rule clean_zips:
     shell:'''
-    rm -rf data_raw/*
+    rm -rf {outdir}/*.csv.zip
     '''
