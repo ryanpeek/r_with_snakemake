@@ -18,14 +18,14 @@ def checkpoint_def_get_clim_data(wildcards):
 
 rule all:
     input:
-        "data_raw/davis_sensor_info_by_id.csv",
-        checkpoint_def_get_clim_data
-        
+        metdat = expand("{outdir}/davis_sensor_info_by_id.csv", outdir = OUTDIR),
+        ct_files = checkpoint_def_get_clim_data,
+        df_all = "data_clean/davis_clim_data.csv.gz"
 
 rule get_metadata:
     input: "src/smk_get_metadata_davis_clim.R"
     output: 
-        csv = "data_raw/davis_sensor_info_by_id.csv"
+        csv = "{outdir}/davis_sensor_info_by_id.csv"
     conda: "envs/tidyverse.yml"
     script: "src/smk_get_metadata_davis_clim.R"
 
@@ -33,20 +33,39 @@ rule get_metadata:
 checkpoint get_clim_data:
     input:
         script = "src/smk_download_davis_clim.R"
+    params: 
+        outdir = "data_raw"
     output: directory("outdir")
     conda: "envs/tidyverse.yml"
     shell:'''
-    Rscript {input.script}
+    Rscript {input.script} \
+        --outdir {params.outdir}
     '''
 # use temp() for intermediate files, smk will keep for downstream until not needed
 # then deletes.
+
+# This breaks or doesn't work
+#rule merge_clim_data:
+#    input:
+#        script = "src/smk_merge_davis_clim.R",
+#        raw = directory("outdir")
+#    params: 
+#        input = "data_raw",
+#       output = "data_clean"
+#    output: "data_clean/davis_clim_data.csv.gz"
+#    conda: "envs/tidyverse.yml"
+#    shell:'''
+#    Rscript {input.script} \
+#        --input {params.input} \
+#        --outdir {params.output}
+#    '''
 
 rule clean_zips:
     shell:'''
     rm -rf {OUTDIR}/*.csv.zip
     '''
 
-rule clean_meta:
+rule clean_all:
     shell:'''
-    rm -rf {OUTDIR}/davis_sensor_info_by_id.csv
+    rm -rf {OUTDIR}/*
     '''

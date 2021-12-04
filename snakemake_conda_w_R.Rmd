@@ -1,0 +1,118 @@
+---
+title: "conda_steps"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+## Create Conda Environment
+
+```{bash}
+conda create --name precip
+conda activate precip
+```
+
+## List Environments
+
+```{bash}
+conda env list
+```
+
+
+## Create Snakemake file
+
+```{bash}
+
+touch Snakefile
+
+```
+
+### Add header variables
+
+```
+import pandas as pd
+m = pd.read_csv("samples/ronca_metadata_final.csv", header = 0)
+PLATES = m['plate_barcode'].unique().tolist() 
+SAMPLES = m['well_barcodefull'].unique().tolist() # well barcode
+```
+
+
+The all rule needs to be the output you are wanting at the end...
+
+```
+rule all:
+    input: 
+        expand("outputs/bams/{lane}_{plate}_{sample}.sort.flt.bam", lane = LANES, plate = PLATES, sample = SAMPLES)
+```
+
+### Add Rules
+
+?*What* is [this](https://github.com/lachlandeer/snakemake-econ-r/blob/master/rules/data_mgt.smk)?
+
+```
+rule filter_bams:
+    input: "outputs/bams/{lane}_{plate}_{sample}.sort.bam"
+    output: "outputs/bams/{lane}_{plate}_{sample}.sort.flt.bam"
+    conda: "envs/samtools_bwa.yml"
+    threads: 1
+    resources:
+        mem_mb=2000,
+        time=2880
+    benchmark: "benchmarks/filter_bams_{lane}_{plate}_{sample}.tsv"
+    shell:"""
+       samtools view -f 0x2 -b {input} | samtools rmdup - {output}
+       """
+```
+
+
+Check this rule out:
+
+```
+## rename_vars     : gives meaningful names to variables 
+rule rename_vars:
+    input:
+        script = config["src_data_mgt"] + "rename_variables.R",
+        data   = config["src_data"] + "mrw.dta",
+    output:
+        data = config["out_data"] + "mrw_renamed.csv",
+    log:
+        config["log"] + "data_cleaning/rename_variables.txt"
+    shell:
+        "{runR} {input.script} --data {input.data} --out {output.data} \
+            > {log} {logAll}"
+```
+
+Or this to [make figures](https://github.com/lachlandeer/snakemake-econ-r/blob/master/rules/figures.smk)
+
+```
+# Rules: figures
+#
+# Contributors: @lachlandeer, @julianlanger, @bergmul
+
+## make_figs: Helper rule to expand wildcard and generate all figures
+rule make_figs:
+    input:
+        expand(config["out_figures"] + "{iFigure}.pdf",
+                iFigure = PLOTS)
+
+## figures: the recipe to make a figures using intermediate country data from MRW
+rule figures:
+    input:
+        script = config["src_figures"] + "{iFigure}.R",
+        data   = config["out_data"] + "mrw_complete.csv",
+        subset = config["src_data_specs"] + "subset_intermediate.json"
+    output:
+        fig = config["out_figures"] + "{iFigure}.pdf",
+    log:
+        config["log"] + "figures/{iFigure}.txt"
+    shell:
+        "{runR} {input.script} \
+            --data {input.data} \
+            --subset {input.subset} \
+            --out {output.fig} \
+            > {log} {logAll}"
+            
+```

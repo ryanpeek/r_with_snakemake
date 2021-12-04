@@ -4,8 +4,27 @@ library(purrr)
 library(dplyr)
 library(glue)
 library(readr)
+library(optparse)
 
-f_download_dav_clim <- function(outdir="data_raw"){
+# add some error and CLI parsing
+option_list = list(
+  make_option(c("-o", "--outdir"),
+              type = "character",
+              default = "data_raw",
+              help = "a dir name",
+              metavar = "character")
+)
+
+opt_parser = OptionParser(option_list = option_list);
+opt = parse_args(opt_parser);
+
+# if (is.null(opt$outdir)){
+#   print_help(opt_parser)
+#   stop("outdir must be provided", call. = FALSE)
+# }
+
+f_download_dav_clim <- function(){
+  outdir <- outdir
   #outdir <- snakemake@wildcards[["outdir"]]
   # get metadata
     metadat <- read_delim("http://apps.atm.ucdavis.edu/wxdata/metadata/sensor_info_by_id.txt", trim_ws = TRUE,
