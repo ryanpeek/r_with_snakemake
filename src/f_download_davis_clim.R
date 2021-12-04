@@ -6,7 +6,7 @@ library(glue)
 library(readr)
 
 f_download_dav_clim <- function(outdir="data_raw"){
-  
+  #outdir <- snakemake@wildcards[["outdir"]]
   # get metadata
     metadat <- read_delim("http://apps.atm.ucdavis.edu/wxdata/metadata/sensor_info_by_id.txt", trim_ws = TRUE,
                         delim="|", skip = 3,
@@ -38,4 +38,4 @@ f_download_dav_clim <- function(outdir="data_raw"){
 
 
 # run with: 
-f_download_dav_clim("data_raw")
+#f_download_dav_clim("data_raw")

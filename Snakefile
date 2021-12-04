@@ -1,21 +1,31 @@
+import os
+import glob
+
 OUTDIR = "data_raw"
 
 def checkpoint_def_get_clim_data(wildcards):
     # checkpoint_output encodes the output dir from the checkpoint rule.
     checkpoint_output = checkpoints.get_clim_data.get(**wildcards).output[0]
-    # can return global here with 'global CT_METRICS'
+    
+    # one option I found:
+    #METRICS = set()  # a set is like a list, but only stores unique values
+    #for METRIC in os.listdir(checkpoint_output):
+    #        METRICS.add(METRIC)
+    #ct_metrics = ["{OUTDIR}/" + METRIC + ".csv.zip" for METRIC in METRICS]
+    #return(ct_metrics)
     file_names = expand("{outdir}/{ct_metrics}.csv.zip", ct_metrics = glob_wildcards(os.path.join(checkpoint_output, "{ct_metrics}.csv.zip")).ct_metrics, outdir = OUTDIR)
     return file_names
 
 rule all:
     input:
+        "data_raw/davis_sensor_info_by_id.csv",
         checkpoint_def_get_clim_data
-            
-#expand("{outdir}/davis_sensor_info_by_id.csv", outdir = OUTDIR)    
+        
 
 rule get_metadata:
+    input: "src/smk_get_metadata_davis_clim.R"
     output: 
-        csv = expand("{outdir}/davis_sensor_info_by_id.csv", outdir=OUTDIR)
+        csv = "data_raw/davis_sensor_info_by_id.csv"
     conda: "envs/tidyverse.yml"
     script: "src/smk_get_metadata_davis_clim.R"
 
@@ -23,7 +33,7 @@ rule get_metadata:
 checkpoint get_clim_data:
     input:
         script = "src/smk_download_davis_clim.R"
-    output: directory("{outdir}")
+    output: directory("outdir")
     conda: "envs/tidyverse.yml"
     shell:'''
     Rscript {input.script}
@@ -34,4 +44,9 @@ checkpoint get_clim_data:
 rule clean_zips:
     shell:'''
     rm -rf {OUTDIR}/*.csv.zip
+    '''
+
+rule clean_meta:
+    shell:'''
+    rm -rf {OUTDIR}/davis_sensor_info_by_id.csv
     '''

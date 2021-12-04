@@ -2,6 +2,8 @@
 
 library(tidyverse)
 
+# print message:
+print("Getting metadata")
 # get metadata
 metadat <- read_delim("http://apps.atm.ucdavis.edu/wxdata/metadata/sensor_info_by_id.txt",
                       trim_ws = TRUE,
@@ -15,4 +17,5 @@ metadat <- read_delim("http://apps.atm.ucdavis.edu/wxdata/metadata/sensor_info_b
 # for testing via Rscript in shell
 #dir.create("data_raw", showWarnings = FALSE)
 #write_csv(metadat, "data_raw/davis_sensor_info_by_id.csv")
+print("Saving metdata")
 write_csv(metadat, snakemake@output[['csv']])
