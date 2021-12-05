@@ -6,7 +6,7 @@ library(glue)
 library(readr)
 library(optparse)
 
-# add some error and CLI parsing
+#add some error and CLI parsing
 option_list <- list(
   make_option(c("-i", "--input"),
               type = "character",
@@ -28,31 +28,37 @@ if (is.null(opt$outdir)){
    stop("outdir must be provided", call. = FALSE)
 }
 
+# testing
+#glue("{opt$input}") # this works only with rule shell:
+#print(snakemake@params[[1]]) # this works only with rule script:
+
+
+# READ IN METADATA
 metadat <- read_csv(glue("{opt$input}/davis_sensor_info_by_id.csv"))
-# pull filenames from metadat
-filenames <- metadat$metric_id
+filenames <- metadat$metric_id # pull filenames from metadat
 # get only stations that start with CT cambell tract
 filenames_ct <- glue("{opt$input}/{filenames[grepl('^CT', filenames)]}.csv.zip")
-#filenames_ct
 
 # check/create dir exists
+glue("Create directory: {opt$outdir}")
 fs::dir_create(glue("{opt$outdir}"))
-
-# download_files
-df_all <- map(filenames_ct, 
+ 
+# read in the files
+df_all <- map(filenames_ct,
     ~read_csv(.x, col_names = c("station_id", "sensor_id",
-                                "value", "datetime"), 
-              id = "filename")) %>% 
-  bind_rows %>% 
+                                "value", "datetime"),
+              id = "filename", show_col_types = FALSE)) %>%
+  bind_rows %>%
   left_join(metadat)
 
-# may not write out, just avg get data we need
+
+glue("Write out file: {opt$outdir}/davis_clim_data.csv.gz...")
+
 # write out (csv.gz = 125MB, write_rds.xz=, rda.xz=29MB, fst=160MB)
 write_csv(df_all, file = glue("{opt$outdir}/davis_clim_data.csv.gz"))
 
-# works but takes FOREVER
-#save(df_all, file = glue("{opt$outdir}/davis_clim_data.rda"), compress = "xz")
-#write_rds(df_all, file = glue("data_clean/davis_clim_data.rds"), compress = "xz")
+# best option seems to be csv.gz, but may not write out later and 
+# just avg get data we need
 
 # Plotting ----------------------------------------------------------------
 

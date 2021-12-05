@@ -47,3 +47,6 @@ vignettes/*.pdf
 
 # the zips
 data_raw/*zip
+
+# data clean
+data_clean/*
