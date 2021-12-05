@@ -17,17 +17,17 @@ rule all:
         df_all = "data_clean/davis_clim_data.csv.gz"
 
 rule get_metadata:
-    input: "src/smk_get_metadata_davis_clim.R"
+    input: "src/smk1_get_metadata_davis_clim.R"
     output: 
         csv = "{outdir}/davis_sensor_info_by_id.csv"
     conda: "envs/tidyverse.yml"
-    script: "src/smk_get_metadata_davis_clim.R"
+    script: "src/smk1_get_metadata_davis_clim.R"
 
 checkpoint get_clim_data:
     input: expand("{outdir}/davis_sensor_info_by_id.csv", outdir = OUTDIR)
     output: directory("outdir")
     conda: "envs/tidyverse.yml"
-    script: "src/smk_download_davis_clim.R"
+    script: "src/smk2_download_davis_clim.R"
 
 # use temp() for intermediate files, smk will keep for downstream until not needed
 # then deletes.
@@ -35,7 +35,7 @@ checkpoint get_clim_data:
 # This rule works by itself but not in snakemake run all
 rule merge_clim_data:
     input: 
-        script = "src/smk_merge_davis_clim.R",
+        script = "src/smk3_merge_davis_clim.R",
         metadat = expand("{outdir}/davis_sensor_info_by_id.csv", outdir = OUTDIR)
     params: 
         input = "data_raw",
