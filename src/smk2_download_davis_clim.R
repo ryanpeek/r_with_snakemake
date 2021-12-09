@@ -7,34 +7,35 @@ library(readr)
 library(fs)
 
 
-#print(snakemake@input[[1]]) # prints dir and file!
-print(snakemake@output[["csv"]]) # prints dir and file!
+print(snakemake@input[[1]]) # prints dir and file!
+#print(snakemake@output[["csv"]]) # prints dir and file!
 
 # Get outdir only (not full path)
-#outdir <- fs::path_dir(snakemake@output[["csv"]])
-outdir <- "data_raw"
+outdir <- fs::path_dir(snakemake@input[[1]])
+print(glue("Saving to {outdir}"))
 
 # check/create dir exists
 fs::dir_create(glue("{outdir}"))
 
-# get metadata
-#metadat <- read_csv(glue("{outdir}/davis_sensor_info_by_id.csv"), )
-
 # print message:
 print("Getting metadata")
-# get metadata
-metadat <- read_delim("http://apps.atm.ucdavis.edu/wxdata/metadata/sensor_info_by_id.txt",
-                      trim_ws = TRUE,
-                      delim="|", skip = 3,
-                      col_names = c("x1", "sensor_id", "metric_id",
-                                    "station_id", "metric_name",
-                                    "metric_units", "x2")) %>%
-  select(-(starts_with("x"))) %>%
-  filter(!is.na(sensor_id))
 
-print("Saving metdata")
+# get metadata
+metadat <- read_csv(glue("{outdir}/davis_sensor_info_by_id.csv"), )
+
+# # get metadata
+# metadat <- read_delim("http://apps.atm.ucdavis.edu/wxdata/metadata/sensor_info_by_id.txt",
+#                       trim_ws = TRUE,
+#                       delim="|", skip = 3,
+#                       col_names = c("x1", "sensor_id", "metric_id",
+#                                     "station_id", "metric_name",
+#                                     "metric_units", "x2")) %>%
+#   select(-(starts_with("x"))) %>%
+#   filter(!is.na(sensor_id))
+
 #write_csv(metadat, snakemake@output[['csv']])
-write_csv(metadat, glue("{outdir}/davis_sensor_info_by_id.csv"))
+#write_csv(metadat, glue("{outdir}/davis_sensor_info_by_id.csv"))
+
 # pull filenames from metadat
 filenames <- metadat$metric_id
 

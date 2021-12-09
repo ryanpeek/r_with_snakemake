@@ -19,10 +19,16 @@ rule all:
         #expand("{raw}/davis_sensor_info_by_id.csv", raw = DATA_RAW),
         "data_clean/davis_clim_data.csv.gz"
 
-checkpoint get_clim_data:
+rule get_metadata:
+    input: "src/smk1_get_metadata_davis_clim.R"
     output: 
-        dir = directory("raw"),
-        meta = "data_raw/davis_sensor_info_by_id.csv"
+        csv = expand("{raw}/davis_sensor_info_by_id.csv", raw = DATA_RAW)
+    conda: "envs/tidyverse.yml"
+    script: "src/smk1_get_metadata_davis_clim.R"
+
+checkpoint get_clim_data:
+    input: expand("{raw}/davis_sensor_info_by_id.csv", raw = DATA_RAW)
+    output: directory("raw")
     conda: "envs/tidyverse.yml"
     script: "src/smk2_download_davis_clim.R"
 
