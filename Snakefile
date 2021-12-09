@@ -38,7 +38,8 @@ checkpoint get_clim_data:
 # This rule works by itself but not in snakemake run all
 rule merge_clim_data:
     input: 
-        meta = expand("{raw}/davis_sensor_info_by_id.csv", raw = DATA_RAW)
+        meta = expand("{raw}/davis_sensor_info_by_id.csv", raw = DATA_RAW),
+        #files = "{raw}/{ct_metrics}.csv.zip"
     params: 
         input = "data_raw",
         output = "data_clean"
