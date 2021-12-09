@@ -1,0 +1,4 @@
+src: "src/"
+log: "logs/"
+data_raw: "data_raw/"
+data_clean: "data_clean/"
