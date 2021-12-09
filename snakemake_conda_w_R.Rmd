@@ -116,3 +116,12 @@ rule figures:
             > {log} {logAll}"
             
 ```
+
+
+## Make a Dag
+
+`snakemake --dag | dot -Tpdf > dag.pdf`
+
+## Summary
+
+`snakemake --summary`

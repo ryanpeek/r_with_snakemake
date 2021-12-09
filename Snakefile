@@ -10,16 +10,15 @@ DATA_CLEAN = "data_clean"
 def checkpoint_def_get_clim_data(wildcards):
     # checkpoint_output encodes the output dir from the checkpoint rule.
     checkpoint_output = checkpoints.get_clim_data.get(**wildcards).output[0]
-    file_names = expand("{data_raw}/{ct_metrics}.csv.zip", 
-        data_raw = DATA_RAW,
-        ct_metrics = glob_wildcards(os.path.join(checkpoint_output, "{ct_metrics}.csv.zip")).ct_metrics)
+    global file_names
+    file_names = expand("{data_raw}/{ct_metrics}.csv.zip", ct_metrics = glob_wildcards(os.path.join(checkpoint_output, "{ct_metrics}.csv.zip")).ct_metrics, data_raw = DATA_RAW)
     return file_names
 
 rule all:
     input:
         #expand("{data_clean}/davis_clim_data.csv.gz", data_clean = DATA_CLEAN),
-        ct_files = checkpoint_def_get_clim_data,
-        df_all = "data_clean/davis_clim_data.csv.gz"
+        #ct_files = checkpoint_def_get_clim_data,
+        df_all = expand("{data_clean}/davis_clim_data.csv.gz", data_clean=DATA_CLEAN)
 
 rule get_metadata:
     input: "src/smk1_get_metadata_davis_clim.R"
@@ -29,7 +28,7 @@ rule get_metadata:
     script: "src/smk1_get_metadata_davis_clim.R"
 
 checkpoint get_clim_data:
-    input: expand("{data_raw}/davis_sensor_info_by_id.csv", data_raw = DATA_RAW)
+    input: "{data_raw}/davis_sensor_info_by_id.csv"
     output: directory("data_raw")
     conda: "envs/tidyverse.yml"
     script: "src/smk2_download_davis_clim.R"
@@ -41,11 +40,13 @@ checkpoint get_clim_data:
 rule merge_clim_data:
     input: 
         script = "src/smk3_merge_davis_clim.R",
-        metadat = expand("{data_raw}/davis_sensor_info_by_id.csv", data_raw=DATA_RAW)
+        data = rules.get_clim_data.output
+        #chk = expand("{outdir}/{ct_metrics}.csv.zip",
+        #metadat = expand("{data_raw}/davis_sensor_info_by_id.csv", data_raw=DATA_RAW)
     params: 
-        input = "{data_raw}",
-        output = "{data_clean}"
-    output: "{data_clean}/davis_clim_data.csv.gz"
+        input = "data_raw",
+        output = "data_clean"
+    output: "data_clean/davis_clim_data.csv.gz"
     conda: "envs/tidyverse.yml"
     shell:'''
     Rscript {input.script} \
