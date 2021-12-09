@@ -39,7 +39,6 @@ PLATES = m['plate_barcode'].unique().tolist()
 SAMPLES = m['well_barcodefull'].unique().tolist() # well barcode
 ```
 
-
 The all rule needs to be the output you are wanting at the end...
 
 ```
@@ -48,9 +47,34 @@ rule all:
         expand("outputs/bams/{lane}_{plate}_{sample}.sort.flt.bam", lane = LANES, plate = PLATES, sample = SAMPLES)
 ```
 
-### Add Rules
+### Save one rule or sets of rules
 
-?*What* is [this](https://github.com/lachlandeer/snakemake-econ-r/blob/master/rules/data_mgt.smk)?
+See [this](https://github.com/lachlandeer/snakemake-econ-r/blob/master/rules/data_mgt.smk) example of one approach to saving rules or sets of rules independently, using a `.smk` extension. See this example of how to [make figures](https://github.com/lachlandeer/snakemake-econ-r/blob/master/rules/figures.smk).
+
+In the `snakefile` we can call this as follows:
+
+```
+configfile: "paths.yaml"
+runR = "Rscript --no-save --no-restore --verbose"
+logAll = "2>&1"
+
+include: config["rules"] + "data_mgt.smk"
+
+# where a paths.yml specifies this:
+rules          : "rules/"
+src            : "src/"
+log            : "logs/"
+out            : "out/"
+src_data       : "src/data/"
+src_data_mgt   : "src/data-management/"
+out_data       : "out/data/"
+```
+
+### Run in one `snakefile`
+
+Otherwise, we can set up a rule as follows, specifying individual parameters and conda environments for each rule. 
+
+ - **`benchmark`**: is a way to track a specific output within a rule to get a sense of how much memory and time it takes to run. The argument `benchmark:` is the saved output snakemake will create based on the process to create the `output` from that rule.
 
 ```
 rule filter_bams:
@@ -67,6 +91,94 @@ rule filter_bams:
        """
 ```
 
+## Create DAG
+
+We can visualize our rules or process with a DAG. The code to do this is as follows. It may require installing the `graphviz` package via brew if on mac (`brew install graphviz`) or in linux (`sudo apt-get install graphviz`).
+
+### A filegraph
+
+A filegraph will show what files are used and produced per each rule. A rulegraph create the graph of how rules piece together 
+To create we can use:
+
+```
+snakemake --rulegraph | dot -Tpdf > rulegraph_flow.pdf
+snakemake --filegraph | dot -Tpdf > filegraph_flow.pdf
+snakemake --dag | dot -Tpdf > dag.pdf
+```
+This may require installing graphviz:
+`conda install -c conda-forge graphviz`
+
+## Run `snakemake`
+
+We can do a dry run with:
+
+```
+snakemake --cores 1 -p -n 
+```
+
+We can run a single rule with the following. Currently this rule only works when run by itself...need to figure out order.
+
+```
+snakemake --cores 1 -p -n merge_clim_data
+```
+
+We can clean things up with:
+
+```
+snakemake --cores 1 -p -n clean_all
+
+```
+
+## Some Odds & Ends
+
+There are some interesting differences between rules and how they are used. In particular, when using `shell:` vs. `script:`
+
+- `shell:` when using this argument, we can pass additional flags to an rscript, but requires some optparse work in the Rscript itself, and must be called with `Rscript`.
+- `script:` when using this argument, we can't pass additional arguments in the snakemake call...it must be a quoted path to the file (I think). But, we can access individual wildcards and params using the `snakemake@param[["csv"]]` in the R script.
+
+
+### Optparse example
+
+This comes from [here](https://github.com/lachlandeer/snakemake-econ-r/blob/master/src/data-management/gen_reg_vars.R)
+
+```{r, eval=FALSE, echo=TRUE}
+
+# libraries
+library(optparse)
+library(dplyr)
+
+# CLI parsing
+option_list = list(
+    make_option(c("-d", "--data"),
+                type = "character",
+                default = NULL,
+                help = "a csv file name",
+                metavar = "character"),
+    make_option(c("-p", "--param"),
+                type = "numeric",
+                default = 0.05,
+                help = "Solow's Constant, as a numeric [default = %default]",
+                metavar = "numeric"),
+	make_option(c("-o", "--out"),
+                type = "character",
+                default = "out.csv",
+                help = "output file name [default = %default]",
+                metavar = "character")
+);
+
+opt_parser = OptionParser(option_list = option_list);
+opt = parse_args(opt_parser);
+
+if (is.null(opt$data)){
+  print_help(opt_parser)
+  stop("Input data must be provided", call. = FALSE)
+}
+
+# Load data
+print("Loading data")
+mrw_data <- read_csv(opt$data)
+solow_const <- as.numeric(opt$param)
+```
 
 Check this rule out:
 
