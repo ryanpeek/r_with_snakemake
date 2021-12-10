@@ -33,8 +33,8 @@ library(optparse)
 #glue("{opt$input}") # this works only with rule shell:
 #print(snakemake@params[[1]]) # this works only with rule script:
 
-indir <- snakemake@params[["input"]]
-outdir <- snakemake@params[["output"]]
+indir <- snakemake@params[["indir"]]
+outdir <- snakemake@params[["outdir"]]
 
 # READ IN METADATA
 #metadat <- read_csv(glue("{opt$input}/davis_sensor_info_by_id.csv"))

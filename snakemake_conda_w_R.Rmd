@@ -1,14 +1,28 @@
 ---
-title: "conda_steps"
-output: html_document
+title: "Conda & Snakemake Fun"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: lumen
+    highlight: tango
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(eval = FALSE)
+
+# add tabsets in a section with something like this:
+## Quarterly Results {.tabset .tabset-fade}
+### By Product
+#(tab content)
+
+
 ```
 
 ## Create Conda Environment
+
+To create a snakemake environment (assuming you've installed snakemake already and conda):
 
 ```{bash}
 conda create --name precip
@@ -17,12 +31,15 @@ conda activate precip
 
 ## List Environments
 
+When we want to operate within different environments, we can view what exists with the following:
+
 ```{bash}
 conda env list
 ```
 
-
 ## Create Snakemake file
+
+The `Snakefile` is the thing that holds everything together. Make one:
 
 ```{bash}
 
@@ -30,7 +47,11 @@ touch Snakefile
 
 ```
 
-### Add header variables
+### Add Dictionaries or  variables
+
+We can add some header variables based on a csv, or simply as a list or single variable. 
+
+**With a csv**
 
 ```
 import pandas as pd
@@ -39,7 +60,18 @@ PLATES = m['plate_barcode'].unique().tolist()
 SAMPLES = m['well_barcodefull'].unique().tolist() # well barcode
 ```
 
-The all rule needs to be the output you are wanting at the end...
+**With a simple vector or path**
+
+```
+DATA_RAW = "data_raw"
+DATA_CLEAN = "data_clean"
+ZIPS = "zips"
+
+```
+
+### Make a `rule all`
+
+This is the final output you are wanting at the end of the analysis.
 
 ```
 rule all:
@@ -70,7 +102,7 @@ src_data_mgt   : "src/data-management/"
 out_data       : "out/data/"
 ```
 
-### Run in one `snakefile`
+### Parameterizing Rules
 
 Otherwise, we can set up a rule as follows, specifying individual parameters and conda environments for each rule. 
 
@@ -107,6 +139,21 @@ snakemake --dag | dot -Tpdf > dag.pdf
 ```
 This may require installing graphviz:
 `conda install -c conda-forge graphviz`
+
+Can modify these with a text file, then regenerate! 
+
+ - First generate a txt version of the filegraph:
+ 
+    ```
+    snakemake --filegraph | dot > filegraph.txt
+    ```
+ 
+  - Then open and modify the txt file (change color, text, etc), then regenerate pdf with:
+  
+    ```
+    cat filegraph.txt | dot -Tpdf > filegraph_rev.pdf
+    ```
+    
 
 ## Run `snakemake`
 
@@ -228,11 +275,6 @@ rule figures:
             > {log} {logAll}"
             
 ```
-
-
-## Make a Dag
-
-`snakemake --dag | dot -Tpdf > dag.pdf`
 
 ## Summary
 

@@ -11,7 +11,7 @@ print(snakemake@input[[1]]) # prints dir and file!
 #print(snakemake@output[["csv"]]) # prints dir and file!
 
 # Get outdir only (not full path)
-outdir <- fs::path_dir(snakemake@input[[1]])
+outdir <- snakemake@output[[1]]
 print(glue("Saving to {outdir}"))
 
 # check/create dir exists
@@ -21,7 +21,7 @@ fs::dir_create(glue("{outdir}"))
 print("Getting metadata")
 
 # get metadata
-metadat <- read_csv(glue("{outdir}/davis_sensor_info_by_id.csv"), )
+metadat <- read_csv(snakemake@input[[1]])
 
 # # get metadata
 # metadat <- read_delim("http://apps.atm.ucdavis.edu/wxdata/metadata/sensor_info_by_id.txt",
