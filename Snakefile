@@ -6,19 +6,17 @@ import glob
 # set dictionaries
 DATA_RAW = "data_raw"
 DATA_CLEAN = "data_clean"
+ZIPS = "zips"
 
 def checkpoint_def_get_clim_data(wildcards):
     # checkpoint_output encodes the output dir from the checkpoint rule.
     checkpoint_output = checkpoints.get_clim_data.get(**wildcards).output[0]
-    global file_names
-    file_names = expand(f"{DATA_RAW}/{{ct_metrics}}.csv.zip", ct_metrics = glob_wildcards(os.path.join(checkpoint_output, "{ct_metrics}.csv.zip")).ct_metrics)
-    final_out = f"{DATA_CLEAN}/davis_clim_data.csv.gz"
-    return final_out
+    file_names = expand(f"{ZIPS}/{{ct_metrics}}.csv.zip", ct_metrics = glob_wildcards(os.path.join(checkpoint_output, "{ct_metrics}.csv.zip")).ct_metrics)
+    return file_names
 
 rule all:
     input:
-        #"data_clean/davis_clim_data.csv.gz"
-        checkpoint_def_get_clim_data
+        f"{DATA_CLEAN}/davis_clim_data.csv.gz"
 
 rule get_metadata:
     input: "src/smk1_get_metadata_davis_clim.R"
@@ -29,7 +27,7 @@ rule get_metadata:
 
 checkpoint get_clim_data:
     input: f"{DATA_RAW}/davis_sensor_info_by_id.csv"
-    output: directory("raw")
+    output: directory(f"{ZIPS}")
     conda: "envs/tidyverse.yml"
     script: "src/smk2_download_davis_clim.R"
 
@@ -39,9 +37,10 @@ checkpoint get_clim_data:
 # This rule works by itself but not in snakemake run all
 rule merge_clim_data:
     input: 
-        meta = f"{DATA_RAW}/davis_sensor_info_by_id.csv"
+        meta = f"{DATA_RAW}/davis_sensor_info_by_id.csv",
+        checkpoint = checkpoint_def_get_clim_data
     params: 
-        indir = DATA_RAW,
+        indir = ZIPS,
         outdir = DATA_CLEAN
     output: f"{DATA_CLEAN}/davis_clim_data.csv.gz"
     conda: "envs/tidyverse.yml"
