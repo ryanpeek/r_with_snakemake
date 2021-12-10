@@ -6,7 +6,7 @@ import glob
 # set dictionaries
 DATA_RAW = "data_raw"
 DATA_CLEAN = "data_clean"
-ZIPS = "zips"
+ZIPS = "data_raw/zips"
 
 def checkpoint_def_get_clim_data(wildcards):
     # checkpoint_output encodes the output dir from the checkpoint rule.
@@ -54,7 +54,7 @@ rule merge_clim_data:
 
 rule clean_zips:
     shell:'''
-    rm -rf "{DATA_RAW}/*.csv.zip"
+    rm -rf "{ZIPS}/*.csv.zip"
     '''
 
 rule clean_all:

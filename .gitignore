@@ -46,7 +46,7 @@ vignettes/*.pdf
 .DS_Store
 
 # the zips
-data_raw/*zip
+data_raw/zips/*
 
 # data clean
 data_clean/*
