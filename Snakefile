@@ -12,12 +12,11 @@ def checkpoint_def_get_clim_data(wildcards):
     checkpoint_output = checkpoints.get_clim_data.get(**wildcards).output[0]
     global file_names
     file_names = expand(f"{DATA_RAW}/{{ct_metrics}}.csv.zip", ct_metrics = glob_wildcards(os.path.join(checkpoint_output, "{ct_metrics}.csv.zip")).ct_metrics)
-    final_out = expand("{clean}/davis_clim_data.csv.gz", clean = DATA_CLEAN)
+    final_out = f"{DATA_CLEAN}/davis_clim_data.csv.gz"
     return final_out
 
 rule all:
     input:
-        f"{DATA_RAW}/davis_sensor_info_by_id.csv",
         #"data_clean/davis_clim_data.csv.gz"
         checkpoint_def_get_clim_data
 
