@@ -29,7 +29,7 @@ rule get_metadata:
     script: "src/smk1_get_metadata_davis_clim.R"
 
 checkpoint get_clim_data:
-    input: f{"DATA_RAW}/davis_sensor_info_by_id.csv"
+    input: f"{DATA_RAW}/davis_sensor_info_by_id.csv"
     output: directory("raw")
     conda: "envs/tidyverse.yml"
     script: "src/smk2_download_davis_clim.R"
@@ -42,9 +42,9 @@ rule merge_clim_data:
     input: 
         meta = f"{DATA_RAW}/davis_sensor_info_by_id.csv"
     params: 
-        input = DATA_RAW,
-        output = DATA_CLEAN
-    output: "data_clean/davis_clim_data.csv.gz"
+        indir = DATA_RAW,
+        outdir = DATA_CLEAN
+    output: f"{DATA_CLEAN}/davis_clim_data.csv.gz"
     conda: "envs/tidyverse.yml"
     script: "src/smk3_merge_davis_clim.R"
 
