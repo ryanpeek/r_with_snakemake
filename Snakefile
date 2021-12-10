@@ -17,7 +17,7 @@ def checkpoint_def_get_clim_data(wildcards):
 
 rule all:
     input:
-        expand(f"{DATA_RAW}/davis_sensor_info_by_id.csv",
+        f"{DATA_RAW}/davis_sensor_info_by_id.csv",
         #"data_clean/davis_clim_data.csv.gz"
         checkpoint_def_get_clim_data
 
