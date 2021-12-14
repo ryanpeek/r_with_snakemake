@@ -63,5 +63,6 @@ rule clean_zips:
 rule clean_all:
     shell:'''
     rm -rf {ZIPS};
-    rm -rf {DATA_CLEAN}
+    rm -rf {DATA_CLEAN};
+    rm -rf figures/*png
     '''

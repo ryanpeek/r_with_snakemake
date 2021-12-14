@@ -10,11 +10,10 @@ library(ggplot2)
 library(patchwork)
 
 
+# The Data ----------------------------------------------------------------
 
 print(snakemake@input[[1]]) 
 infile <- snakemake@input[[1]]
-
-# READ IN DATA
 
 #data <- read_csv(file = "data_clean/davis_clim_data.csv.gz")
 data <- read_csv(file = infile)
@@ -55,7 +54,7 @@ ppt_daily <- data %>% filter(metric_id == "CT_Rain_Tot24") %>%
   filter(!WY==2009)
 
 # test
-ppt_daily %>% ggplot(data=.) + geom_line(aes(date, tot_ppt_in), color="blue") 
+# ppt_daily %>% ggplot(data=.) + geom_line(aes(date, tot_ppt_in), color="blue") 
 
 # Make Monthly Precip -----------------------------------------------------
 
@@ -104,9 +103,9 @@ gg_ppt_daily <- ppt_daily %>% filter(month %in% c("10","11","12")) %>% ungroup()
   labs(title = "Davis CA: Fall Precip", y="Precip (in)", x="Water Year",
        caption = glue("Data Source: <http://atm.ucdavis.edu/weather/> \nupdated: {Sys.Date()}"))
  
-
-gg_ppt_wk / gg_ppt_daily
+# combine
+plot_out <- gg_ppt_wk / gg_ppt_daily
 
 # save it!
-ggsave(filename = snakemake@output[[1]], width = 11, height = 8.5, dpi=300)
+ggsave(plot_out, filename = snakemake@output[[1]], width = 11, height = 8.5, dpi=300)
 #ggsave(filename = glue("figures/monthly_weekly_precip_davis_ca_updated_{Sys.Date()}.png"), width = 11, height = 8.5, dpi=300)
