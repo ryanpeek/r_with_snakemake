@@ -1,4 +1,8 @@
-# download Davis climate data
+# download Davis climate data:
+# http://ipm.ucanr.edu/WEATHER/index.html
+# see here for daily 1980 to current:
+## http://ipm.ucanr.edu/calludt.cgi/WXSTATIONDATA?MAP=&STN=DAVIS.T
+
 
 library(purrr)
 library(dplyr)
@@ -34,19 +38,24 @@ metadat <- read_csv(snakemake@input[[1]])
 #   filter(!is.na(sensor_id))
 
 #write_csv(metadat, snakemake@output[['csv']])
-#write_csv(metadat, glue("{outdir}/davis_sensor_info_by_id.csv"))
 
 # pull filenames from metadat
 filenames <- metadat$metric_id
 
-# get only stations that start with CT cambell tract
-filenames_ct <- filenames[grepl("^CT", filenames)]
 # stations:
 # 1 | Russell Ranch  ("RR")
 # 2 | Campbell Tract ("CT")
 
+# get only stations that start with have CT cambell tract
+filenames_ct <- filenames[grepl("^CT", filenames)]
+
+# get only rain and temp data:
+filenames_sel <- metadat %>% filter(metric_id %in% c("CT_Rain_Tot24", "CT_Ta2m")) %>% 
+  pull(metric_id)
+  
+
 # download_files
-map(filenames_ct,
+map(filenames_sel,
     ~download.file(
       url = glue("http://apps.atm.ucdavis.edu/wxdata/data/{.x}.zip"),
       destfile = glue("{outdir}/{.x}.csv.zip")))

@@ -16,7 +16,8 @@ def checkpoint_def_get_clim_data(wildcards):
 
 rule all:
     input:
-        f"{DATA_CLEAN}/davis_clim_data.csv.gz"
+        "figures/monthly_weekly_precip_davis_ca_updated.png"
+        #f"{DATA_CLEAN}/davis_clim_data.csv.gz"
 
 rule get_metadata:
     input: "src/smk1_get_metadata_davis_clim.R"
@@ -34,7 +35,7 @@ checkpoint get_clim_data:
 # use temp() for intermediate files, smk will keep for downstream until not needed
 # then deletes.
 
-# This rule works by itself but not in snakemake run all
+# merge data
 rule merge_clim_data:
     input: 
         meta = f"{DATA_RAW}/davis_sensor_info_by_id.csv",
@@ -46,11 +47,13 @@ rule merge_clim_data:
     conda: "envs/tidyverse.yml"
     script: "src/smk3_merge_davis_clim.R"
 
-#    shell:'''
-#    Rscript {input.script} \
-#        --input {params.input} \
-#        --outdir {params.output}
-#    '''
+# viz data
+rule viz_data:
+    input: f"{DATA_CLEAN}/davis_clim_data.csv.gz"
+    output: "figures/monthly_weekly_precip_davis_ca_updated.png"
+    conda: "envs/tidyverse.yml"
+    script: "src/smk4_visualize.R"
+
 
 rule clean_zips:
     shell:'''
@@ -59,6 +62,6 @@ rule clean_zips:
 
 rule clean_all:
     shell:'''
-    rm -rf {DATA_RAW}/*;
-    rm -rf {DATA_CLEAN}/*.gz
+    rm -rf {ZIPS};
+    rm -rf {DATA_CLEAN}
     '''
