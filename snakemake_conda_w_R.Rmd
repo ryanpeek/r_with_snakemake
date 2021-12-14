@@ -133,9 +133,9 @@ A filegraph will show what files are used and produced per each rule. A rulegrap
 To create we can use:
 
 ```
-snakemake --rulegraph | dot -Tpdf > rulegraph_flow.pdf
-snakemake --filegraph | dot -Tpdf > filegraph_flow.pdf
-snakemake --dag | dot -Tpdf > dag.pdf
+snakemake --rulegraph | dot -Tpdf > figures/rulegraph_flow.pdf
+snakemake --filegraph | dot -Tpdf > figures/filegraph_flow.pdf
+snakemake --dag | dot -Tpdf > figures/dag.pdf
 ```
 This may require installing graphviz:
 `conda install -c conda-forge graphviz`
