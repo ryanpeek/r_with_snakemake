@@ -29,6 +29,14 @@ conda create --name precip
 conda activate precip
 ```
 
+Create from file:
+
+```
+conda env create -f environment.yml
+# or if current dir with yml file
+conda env create
+```
+
 ## List Environments
 
 When we want to operate within different environments, we can view what exists with the following:
