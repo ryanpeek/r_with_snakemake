@@ -6,27 +6,46 @@ output:
     toc_float: true
     theme: lumen
     highlight: tango
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(eval = FALSE)
 
-# add tabsets in a section with something like this:
-## Quarterly Results {.tabset .tabset-fade}
-### By Product
-#(tab content)
+```
 
+```{r reticulate}
+Sys.setenv(RETICULATE_MINICONDA_PATH = "/Users/rapeek/mambaforge")
+#Sys.getenv("RETICULATE_PYTHON")
 
+# library(reticulate)
+# reticulate::py_config()
+# reticulate::py_numpy_available()
+# use_miniconda("precip"
+# use_condaenv("precip")
+# reticulate::miniconda_update()
 ```
 
 ## Create Conda Environment
 
 To create a snakemake environment (assuming you've installed snakemake already and conda):
 
-```{bash}
-conda create --name precip
-conda activate precip
+```{python, eval=FALSE}
+
+mamba create -c conda-forge -c bioconda -n precip snakemake-minimal
+#conda create --name precip
+#mamba create -n precip
+# may need mamba init
+
+```
+
+
+```{python}
+
+mamba activate precip
+
 ```
 
 Create from file:
@@ -43,6 +62,9 @@ When we want to operate within different environments, we can view what exists w
 
 ```{bash}
 conda env list
+# list packages in env
+conda list -n precip
+
 ```
 
 ## Create Snakemake file
