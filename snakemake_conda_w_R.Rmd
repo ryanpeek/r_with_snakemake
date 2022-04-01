@@ -38,7 +38,25 @@ mamba create -c conda-forge -c bioconda -n precip snakemake-minimal
 #conda create --name precip
 #mamba create -n precip
 # may need mamba init
+# To delete:
+# mamba env remove -n precip
 
+# if issues with M1 rosetta try this to use rosetta arch
+# https://github.com/conda-forge/miniforge/issues/165#issuecomment-860233092
+# CONDA_SUBDIR=osx-64 conda create -n rosetta python   # create a new environment called rosetta with intel packages.
+# conda activate rosetta
+# python -c "import platform;print(platform.machine())"
+# conda env config vars set CONDA_SUBDIR=osx-64  # make sure that conda commands in this environment use intel packages
+# conda deactivate rosetta
+# conda activate rosetta
+# echo "CONDA_SUBDIR: $CONDA_SUBDIR"
+
+# create from yml
+#mamba env export > rosetta_environ.yml
+
+# fix names
+#mamba env create -f rosetta_environ.yml
+ 
 ```
 
 
@@ -64,6 +82,9 @@ When we want to operate within different environments, we can view what exists w
 conda env list
 # list packages in env
 conda list -n precip
+
+# install csvtk
+conda install -c bioconda csvtk
 
 ```
 
