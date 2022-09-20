@@ -15,9 +15,13 @@ library(patchwork)
 print(snakemake@input[[1]]) 
 infile <- snakemake@input[[1]]
 
+# for testing
 #data <- read_csv(file = "data_clean/davis_clim_data.csv.gz")
+
+# from snakemake
 data <- read_csv(file = infile)
 
+# hist data to to add compare
 data_hist <- read_csv(file = "data_raw/davis_daily_historical_1980_2021.csv", skip = 63) %>%
   clean_names() %>%
   mutate(date = ymd(date)) %>%
@@ -90,6 +94,8 @@ gg_ppt_mon <- ggplot() +
   ggdark::dark_theme_bw() +
   theme(axis.text.x = element_text(angle=90, vjust = 0.5))+
   facet_wrap(.~WY)
+ 
+ggsave(gg_ppt_mon, filename = "figures/precip_by_month_1981_current.png", width = 11, height = 8.5, dpi=300)
 
 # weekly through time
 gg_ppt_wk <- ggplot() +
@@ -99,12 +105,14 @@ gg_ppt_wk <- ggplot() +
   geom_col(data=ppt_wk %>% filter(WY==as.integer(format(Sys.Date(), "%Y"))),
            aes(x=wk_wy, y=tot_ppt_mm), 
            fill="coral", alpha=0.8, color="maroon") +
-  labs(x="Weeks (by Water Year: Oct 1 - Sep 30)", y="Weekly Precip (in)", 
+  labs(x="Weeks (by Water Year: Oct 1 - Sep 30)", y="Weekly Precip (mm)", 
        title = "Davis CA: Precip by Week")+
   ggdark::dark_theme_bw() +
   theme(axis.text.x = element_blank())+
   facet_wrap(.~WY)
 
+ggsave(gg_ppt_wk, filename = "figures/precip_by_week_1981_current.png", width = 11, height = 8.5, dpi=300)
+  
 # Look at Fall only
 # gg_ppt_daily <- ppt_daily %>% filter(month %in% c("10","11","12")) %>% ungroup() %>% 
 #   ggplot() + geom_col(aes(x=as.factor(WY), y=tot_ppt_in, fill=month))+
@@ -127,4 +135,5 @@ plot_out <- gg_ppt_wk / gg_ppt_daily
 
 # save it!
 ggsave(plot_out, filename = snakemake@output[[1]], width = 11, height = 8.5, dpi=300)
+
 #ggsave(filename = glue("figures/monthly_weekly_precip_davis_ca_updated_{Sys.Date()}.png"), width = 11, height = 8.5, dpi=300)
