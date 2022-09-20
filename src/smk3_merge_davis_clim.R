@@ -1,4 +1,4 @@
-# download Davis climate data
+# merge Davis climate data
 
 library(purrr)
 library(dplyr)

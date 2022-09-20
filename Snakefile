@@ -16,9 +16,9 @@ def checkpoint_def_get_clim_data(wildcards):
 
 rule all:
     input:
-        "figures/monthly_weekly_precip_davis_ca_updated.png",
-        "figures/precip_by_month_1981_current.png",
-        "figures/precip_by_week_1981_current.png"
+        "figures/monthly_weekly_precip_davis_ca_updated.png"
+        #"figures/precip_by_month_1981_current.png",
+        #"figures/precip_by_week_1981_current.png"
         #f"{DATA_CLEAN}/davis_clim_data.csv.gz"
 
 rule get_metadata:

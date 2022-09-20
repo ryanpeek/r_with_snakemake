@@ -22,15 +22,17 @@ infile <- snakemake@input[[1]]
 data <- read_csv(file = infile)
 
 # hist data to to add compare
-data_hist <- read_csv(file = "data_raw/davis_daily_historical_1980_2021.csv", skip = 63) %>%
+data_hist <- read_csv(file = "data_raw/davis_daily_historical_1951_2021.csv", skip = 59) %>%
   clean_names() %>%
-  mutate(date = ymd(date)) %>%
-  rename(precip_mm=precip, air_max_c = air_max, air_min_c=min_7,
+  mutate(date = ymd(date),
+         precip_mm = precip * 25.4) %>%
+  rename(precip_in = precip, air_max_c = air_max, air_min_c=min_7,
          soil_max_c = soil_max, soil_min_c=min_15,
          solar_wsqm = solar) %>%
-  select(station, date, precip_mm, air_max_c:air_min_c, soil_max_c:soil_min_c, solar_wsqm)
-data_hist <- data_hist %>% wateRshedTools::add_WYD("date")
+  select(station, date, precip_in, precip_mm, air_max_c:air_min_c, soil_max_c:soil_min_c, solar_wsqm)
 
+# add Water Year
+data_hist <- data_hist %>% wateRshedTools::add_WYD("date")
 
 # Clean Data ----------------------------------------------------------------
 
@@ -90,7 +92,9 @@ gg_ppt_mon <- ggplot() +
   geom_col(data=ppt_mon %>% filter(WY==as.integer(format(Sys.Date(), "%Y"))),
            aes(x=mon_wy, y=tot_ppt_mm, group=mon_wy), 
            fill="coral", alpha=0.8, color="maroon") +
-  labs(x="Month", y="Total Precip (mm)", subtitle="Precip by Water Year") + 
+  geom_hline(yintercept = 50.8, color="gray50", alpha=0.4, lwd=0.7)+
+  labs(x="Months (by Water Year: Oct 1 - Sep 30)", y="Monthly Precip (mm)", 
+       subtitle = "Davis CA: Precip by Month (gray line = 2 in)")+
   ggdark::dark_theme_bw() +
   theme(axis.text.x = element_text(angle=90, vjust = 0.5))+
   facet_wrap(.~WY)
@@ -106,7 +110,7 @@ gg_ppt_wk <- ggplot() +
            aes(x=wk_wy, y=tot_ppt_mm), 
            fill="coral", alpha=0.8, color="maroon") +
   labs(x="Weeks (by Water Year: Oct 1 - Sep 30)", y="Weekly Precip (mm)", 
-       title = "Davis CA: Precip by Week")+
+       subtitle = "Davis CA: Precip by Week (gray line = 2 in)")+
   ggdark::dark_theme_bw() +
   theme(axis.text.x = element_blank())+
   facet_wrap(.~WY)
@@ -129,9 +133,22 @@ gg_ppt_daily <- ppt_daily %>% filter(month %in% c("10","11","12", "1", "2")) %>%
   labs(title = "Davis CA: Winter Precip", y="Precip (in)", x="Water Year",
        caption = glue("Data Source: <http://atm.ucdavis.edu/weather/> \nupdated: {Sys.Date()}"))
 
+# last 30 years
+gg_ppt_wk_trim <- ggplot() +
+  geom_col(data=ppt_wk %>% filter(WY>1990),
+           aes(x=wk_wy, y=tot_ppt_mm, group=WY),
+           fill="steelblue", alpha=0.8, color="skyblue") +
+  geom_col(data=ppt_wk %>% filter(WY==as.integer(format(Sys.Date(), "%Y"))),
+           aes(x=wk_wy, y=tot_ppt_mm), 
+           fill="coral", alpha=0.8, color="maroon") +
+  labs(x="Weeks (by Water Year: Oct 1 - Sep 30)", y="Weekly Precip (mm)", 
+       subtitle = "Davis CA: Precip by Week (gray line = 2 in)")+
+  ggdark::dark_theme_bw() +
+  theme(axis.text.x = element_blank())+
+  facet_wrap(.~WY)
 
 # combine
-plot_out <- gg_ppt_wk / gg_ppt_daily
+plot_out <- gg_ppt_wk_trim / gg_ppt_daily
 
 # save it!
 ggsave(plot_out, filename = snakemake@output[[1]], width = 11, height = 8.5, dpi=300)

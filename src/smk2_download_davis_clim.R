@@ -1,6 +1,6 @@
 # download Davis climate data:
 # http://ipm.ucanr.edu/WEATHER/index.html
-# see here for daily 1980 to current:
+# see here for daily 1950 to current:
 ## http://ipm.ucanr.edu/calludt.cgi/WXSTATIONDATA?MAP=&STN=DAVIS.T
 
 
