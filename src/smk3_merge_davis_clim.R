@@ -32,22 +32,26 @@ library(fs)
 #glue("{opt$input}") # this works only with rule shell:
 #print(snakemake@params[[1]]) # this works only with rule script:
 
+# indir <- "data_raw/zips"
+# outdir <- "data_clean"
+
 indir <- snakemake@params[["indir"]]
 outdir <- snakemake@params[["outdir"]]
 
-# READ IN METADATA
-#metadat <- read_csv(glue("{opt$input}/davis_sensor_info_by_id.csv"))
-metadat <- read_csv(snakemake@input["meta"])
+# check/create dir exists
+glue("Create directory: {outdir}")
+fs::dir_create(glue("{outdir}"))
 
+# READ IN METADATA
+# metadat <- read_csv(glue("data_raw/davis_sensor_info_by_id.csv"))
+
+print("getting metadata...")
+metadat <- read_csv(file = snakemake@input["meta"]$meta)
 filenames <- metadat$metric_id # pull filenames from metadat
 
 # get filenames present
 filenames_ct <- fs::dir_ls(glue("{indir}/"), glob ="*.csv.zip")
 
-# check/create dir exists
-glue("Create directory: {outdir}")
-fs::dir_create(glue("{outdir}"))
- 
 # read in the files and make hourly
 df_all <- map(filenames_ct,
     ~read_csv(.x, col_names = c("station_id", "sensor_id",
@@ -65,5 +69,3 @@ glue("Write out file: {outdir}/davis_clim_data.csv.gz...")
 
 # write out (csv.gz = 125MB, write_rds.xz=, rda.xz=29MB, fst=160MB)
 write_csv(df_all, file = glue("{outdir}/davis_clim_data.csv.gz"))
-
-# best option seems to be csv.gz, but may not write out later and 
