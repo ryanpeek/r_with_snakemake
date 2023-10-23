@@ -5,6 +5,7 @@ import glob
 rule all:
     input:
         'figures/precip_by_month_last_20yrs_current.png',
+        'data_raw/zips',
         'data_clean/davis_clim_data.csv.gz', 
         #'figures/precip_by_month_1981_current.png',
         #'figures/precip_by_week_1981_current.png'
@@ -51,7 +52,7 @@ rule clean_zips:
 
 rule clean_all:
     shell:'''
-    rm -rf data_raw/zips;
+    rm -rf data_raw/zips/;
     rm -rf data_clean;
     rm -rf figures/*png
     '''
