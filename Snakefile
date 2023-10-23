@@ -18,7 +18,7 @@ rule get_metadata:
 
 rule get_clim_data:
     input: 'data_raw/davis_sensor_info_by_id.csv'
-    output: directory('zips')
+    output: directory('data_raw/zips')
     conda: 'envs/tidyverse.yml'
     script: 'src/smk2_download_davis_clim.R'
 

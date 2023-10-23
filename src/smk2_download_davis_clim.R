@@ -3,13 +3,11 @@
 # see here for daily 1950 to current:
 ## http://ipm.ucanr.edu/calludt.cgi/WXSTATIONDATA?MAP=&STN=DAVIS.T
 
-
 library(purrr)
 library(dplyr)
 library(glue)
 library(readr)
 library(fs)
-
 
 print(snakemake@input[[1]]) # prints dir and file!
 #print(snakemake@output[["csv"]]) # prints dir and file!
