@@ -79,6 +79,88 @@ ppt_wk <- ppt_daily_all |>
 
 # Plot Precip -------------------------------------------------------------
 
+# make theme to avoid pkg install hrbrthemes::theme_ft_rc()
+grid_col <- axis_col <- "#464950"
+subtitle_col <- "gray80"
+ft_text_col <- "gray80"
+def_fore <- "#617a89"
+bkgrnd <- "#252a32"
+fgrnd <- "#617a89"
+base_family = "Roboto Condensed"
+base_size = 11.5
+plot_title_family = base_family 
+subtitle_family = base_family
+plot_title_size = 18
+plot_title_face = "bold" 
+plot_title_margin = 10
+subtitle_size = 13
+subtitle_face = "plain" 
+subtitle_margin = 15
+strip_text_family = base_family
+strip_text_size = 12 
+strip_text_face = "plain"
+caption_family = base_family
+caption_size = 9
+caption_face = "plain" 
+caption_margin = 10
+axis_text_size = base_size 
+axis_title_family = base_family
+axis_title_size = 9
+axis_title_face = "plain"
+axis_title_just = "rt"
+plot_margin = margin(30, 30, 30, 30)
+
+
+cust <- theme(
+  legend.background = element_blank(),
+  legend.key = element_blank(),
+  panel.grid = element_line(color = grid_col, 
+                            size = 0.2),
+  panel.grid.major = element_line(color = grid_col, 
+                                  size = 0.2),
+  panel.grid.minor = element_line(color = grid_col, 
+                                  size = 0.15),
+  axis.line.x = element_blank(),
+  axis.line.y = element_blank(),
+  axis.ticks = element_blank(),
+  axis.ticks.x = element_blank(),
+  axis.ticks.y = element_blank(),
+  axis.text.x = element_text(size = axis_text_size, 
+                             margin = margin(t = 0)),
+  axis.text.y = element_text(size = axis_text_size, 
+                             margin = margin(r = 0)),
+  strip.background = element_rect(fill = bkgrnd, color = bkgrnd),
+  strip.text = element_text(hjust = 0, size = strip_text_size, 
+                            color = subtitle_col, 
+                            face = strip_text_face, 
+                            family = strip_text_family),
+  panel.spacing = grid::unit(2, "lines"),
+  plot.title = element_text(hjust = 0, size = plot_title_size, 
+                            margin = margin(b = plot_title_margin), 
+                            family = plot_title_family, 
+                            face = plot_title_face),
+  plot.subtitle = element_text(hjust = 0, 
+                               size = subtitle_size, color = subtitle_col, 
+                               margin = margin(b = subtitle_margin), 
+                               family = subtitle_family, face = subtitle_face),
+  plot.caption = element_text(hjust = 1, 
+                              size = caption_size, margin = margin(t = caption_margin), 
+                              family = caption_family, face = caption_face),
+  plot.margin = plot_margin)
+
+cust_theme <- cust + theme(rect = element_rect(fill = bkgrnd, color = bkgrnd)) + 
+  theme(plot.background = element_rect(fill = bkgrnd, color = bkgrnd)) + 
+  theme(panel.background = element_rect(fill = bkgrnd, 
+                                        color = bkgrnd)) + theme(rect = element_rect(fill = bkgrnd, 
+                                                                                     color = bkgrnd)) + theme(text = element_text(color = ft_text_col)) + 
+  theme(axis.text = element_text(color = ft_text_col)) + 
+  theme(title = element_text(color = ft_text_col)) + theme(plot.title = element_text(color = "white")) + 
+  theme(plot.subtitle = element_text(color = ft_text_col)) + 
+  theme(plot.caption = element_text(color = ft_text_col)) + 
+  theme(line = element_line(color = grid_col)) + theme(axis.ticks = element_line(color = grid_col))
+  
+
+
 # max ppt: barplot of last 20 yrs
 gg_ppt_mon <- ggplot() +
   geom_col(data=ppt_mon |> filter(WY > as.integer(format(Sys.Date(), "%Y"))-29), 
@@ -91,7 +173,9 @@ gg_ppt_mon <- ggplot() +
   geom_hline(yintercept = 50.8, color="gray50", alpha=0.4, lwd=0.7)+
   labs(x="Months (by Water Year: Oct 1 - Sep 30)", y="Monthly Precip (mm)", 
        title = "Davis CA: Precip by Month (gray line = 2 in)")+
-  hrbrthemes::theme_ft_rc() +
+  cust_theme +
+  #hrbrthemes::theme_ft_rc() +
+  
   theme(axis.text.x = element_text(angle=90, vjust = 0.5))+
   facet_wrap(.~WY)
  
@@ -107,25 +191,28 @@ gg_ppt_wk <- ggplot() +
            fill="coral", alpha=0.95, color="maroon") +
   labs(x="Weeks (by Water Year: Oct 1 - Sep 30)", y="Weekly Precip (mm)", 
        title = "Davis CA: Precip by Week (gray line = 2 in)")+
-  hrbrthemes::theme_ft_rc() +
+  cust_theme + 
+  #hrbrthemes::theme_ft_rc() +
   theme(axis.text.x = element_blank())+
   facet_wrap(.~WY)
 
-ggsave(gg_ppt_wk, filename = "figures/precip_by_week_1981_current.png", width = 11, height = 8.5, dpi=300)
+ggsave(gg_ppt_wk, filename = "figures/precip_by_week_1981_current.png", 
+       width = 11, height = 8.5, dpi=300)
   
 # last 30 years
-gg_ppt_wk_trim <- ggplot() +
-  geom_col(data=ppt_wk |> filter(WY>1990),
-           aes(x=wk_wy, y=tot_ppt_mm, group=WY),
-           fill="steelblue", alpha=0.8, color="skyblue") +
-  geom_col(data=ppt_wk |> filter(WY==as.integer(wtr_yr(Sys.Date()))),
-           aes(x=wk_wy, y=tot_ppt_mm), 
-           fill="coral", alpha=0.8, color="maroon") +
-  labs(x="Weeks (by Water Year: Oct 1 - Sep 30)", y="Weekly Precip (mm)", 
-       title = "Davis CA: Precip by Week (gray line = 2 in)")+
-  hrbrthemes::theme_ft_rc() +
-  theme(axis.text.x = element_blank())+
-  facet_wrap(.~WY)
+# gg_ppt_wk_trim <- ggplot() +
+#   geom_col(data=ppt_wk |> filter(WY>1990),
+#            aes(x=wk_wy, y=tot_ppt_mm, group=WY),
+#            fill="steelblue", alpha=0.8, color="skyblue") +
+#   geom_col(data=ppt_wk |> filter(WY==as.integer(wtr_yr(Sys.Date()))),
+#            aes(x=wk_wy, y=tot_ppt_mm), 
+#            fill="coral", alpha=0.8, color="maroon") +
+#   labs(x="Weeks (by Water Year: Oct 1 - Sep 30)", y="Weekly Precip (mm)", 
+#        title = "Davis CA: Precip by Week (gray line = 2 in)")+
+#   #hrbrthemes::theme_ft_rc() +
+#   cust_theme +
+#   theme(axis.text.x = element_blank())+
+#   facet_wrap(.~WY)
 
 # combine
 #plot_out <- gg_ppt_wk_trim / gg_ppt_mon

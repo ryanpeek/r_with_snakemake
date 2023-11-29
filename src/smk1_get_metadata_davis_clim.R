@@ -4,8 +4,9 @@ library(tidyverse)
 
 # print message:
 print("Getting metadata")
-# get metadata
-metadat <- read_delim("http://apps.atm.ucdavis.edu/wxdata/metadata/sensor_info_by_id.txt",
+# get metadata: "http://apps.atm.ucdavis.edu/wxdata/metadata/sensor_info_by_id.txt"
+
+metadat <- read_delim("data_raw/raw_metadata.txt",
                       trim_ws = TRUE,
                       delim="|", skip = 3,
                       col_names = c("x1", "sensor_id", "metric_id",
