@@ -4,22 +4,25 @@ snakemake workflow using R scripts to pull precipitation/climate data for Davis
 
 ## To run:
 
-Must have `conda` and/or `mamba` installed. 
+Must have `conda` installed. Make sure you are in the directory this R project lives in.
 
 ## Create the environment from yml
 
 ```
 # from this file:
-mamba env create -f environment.yml
+conda env create -f environment.yml
 
 # or from scratch:
-mamba create -n precip
+conda create -n precip
+
+# to remove: conda env remove -n precip
+
 ```
 
 ## Activate the environment:
 
 ```
-mamba activate precip
+conda activate precip
 ```
 
 ## Run Snake!
